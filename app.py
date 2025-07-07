@@ -4,7 +4,6 @@ import os
 from PIL import Image
 import matplotlib.pyplot as plt
 import seaborn as sns
-
 # Configuración básica de la página
 st.set_page_config(
     page_title="Análisis de Películas",

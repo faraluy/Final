@@ -1,4 +1,4 @@
- import streamlit as st
+import streamlit as st
 import pandas as pd
 import os
 from PIL import Image
@@ -65,41 +65,48 @@ elif seleccion == "Visualizaciones":
         st.error(f"No se pudo cargar la visualización: {e}")
 
 elif seleccion == "Recomendador":
-    st.header("Sistema de recomendación de películas")
-    st.write("""
-    Encuentra películas según tus preferencias: actor, género, director o país.
-    """)
+    st.header("Quizz de recomendación de películas 🎯")
+    st.write("Responde las siguientes 6 preguntas y obtendrás 5 recomendaciones según tu perfil cinéfilo.")
 
-    filtro_actor = st.selectbox("Selecciona un actor", sorted(actores_directores['actor'].dropna().unique()))
-    filtro_genero = st.selectbox("Selecciona un género", sorted(actores_directores['genero'].dropna().unique()))
-    filtro_director = st.selectbox("Selecciona un director", sorted(actores_directores['director'].dropna().unique()))
-    filtro_pais = st.selectbox("Selecciona un país de origen", sorted(actores_directores['pais'].dropna().unique()))
+    col1, col2 = st.columns(2)
+    with col1:
+        actor_sel = st.selectbox("1. ¿Actor que prefieres?", sorted(actores_directores['actor'].dropna().unique()))
+        genero_sel = st.selectbox("2. ¿Género favorito?", sorted(actores_directores['genero'].dropna().unique()))
+        duracion_max = st.slider("3. ¿Duración máxima que prefieres? (minutos)", 60, 240, 120)
+    with col2:
+        director_sel = st.selectbox("4. ¿Director favorito?", sorted(actores_directores['director'].dropna().unique()))
+        pais_sel = st.selectbox("5. ¿País de origen de la película?", sorted(actores_directores['pais'].dropna().unique()))
+        anio_max = st.slider("6. ¿Año máximo de estreno?", 1950, 2025, 2020)
 
-    if st.button("Recomendar películas"):
-        recomendaciones = actores_directores[
-            (actores_directores['actor'] == filtro_actor) &
-            (actores_directores['genero'] == filtro_genero) &
-            (actores_directores['director'] == filtro_director) &
-            (actores_directores['pais'] == filtro_pais)
+    if st.button("🎬 Mostrar mis 5 películas ideales"):
+        resultados = actores_directores[
+            (actores_directores['actor'] == actor_sel) &
+            (actores_directores['genero'] == genero_sel) &
+            (actores_directores['director'] == director_sel) &
+            (actores_directores['pais'] == pais_sel) &
+            (actores_directores['duracion'] <= duracion_max) &
+            (actores_directores['anio'] <= anio_max)
         ]
 
-        if not recomendaciones.empty:
-            st.success("Películas recomendadas:")
-            for i, row in recomendaciones.head(3).iterrows():
+        if not resultados.empty:
+            st.success("🎉 Aquí tienes tus recomendaciones:")
+            for i, row in resultados.head(5).iterrows():
                 st.subheader(row['pelicula'])
                 st.write(f"🎬 Director: {row['director']}")
                 st.write(f"🧑 Actor principal: {row['actor']}")
                 st.write(f"🌍 País: {row['pais']}")
                 st.write(f"🎭 Género: {row['genero']}")
+                st.write(f"🕐 Duración: {row['duracion']} minutos")
+                st.write(f"📅 Año: {row['anio']}")
                 st.write("---")
         else:
-            st.warning("No se encontraron películas que coincidan con todos los filtros.")
+            st.warning("😕 No se encontraron coincidencias exactas. Prueba con otras combinaciones.")
 
 elif seleccion == "Acerca de":
     st.header("Acerca de este proyecto")
     st.write("""
     Este proyecto fue creado para analizar datos de películas y proporcionar 
-    recomendaciones basadas en preferencias de usuarios.
+    recomendaciones personalizadas según decisiones del usuario.
 
     **Tecnologías utilizadas:**
     - Python
